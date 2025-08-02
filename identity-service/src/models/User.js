@@ -40,7 +40,7 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-userSchema.methods.comaparePassword = async function (candidatePassword) {
+userSchema.methods.comparePassword = async function (candidatePassword) {
   try {
     return await argon2.verify(this.password, candidatePassword);
   } catch (error) {

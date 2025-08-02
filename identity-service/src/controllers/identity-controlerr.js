@@ -50,14 +50,14 @@ const loginUser = async (req, res) => {
   const { email, password } = req.body;
   logger.info("Login endpoint initiated...");
   try {
-    const { email, username } = validateInput(error);
-    if (error) {
-      logger.warn("Validation error", error.details[0].message);
-      return res
-        .status(404)
-        .json({ success: false, message: error.details[0].message });
-    }
+    // const { email, username } = validateInput(error);
+    // if (error) {
+    //   logger.warn("Validation error");
+    //   return res.status(404).json({ success: false, message: error });
+    // }
+
     const user = await User.findOne({ email });
+    // console.log(user);
     if (!user) {
       logger.warn("Invalid user details");
       return res
@@ -75,13 +75,10 @@ const loginUser = async (req, res) => {
       });
     }
     const { accessToken, refreshToken } = await generateToken(user);
-    res.json({
-      accessToken,
-      refreshToken,
-      userId: user._id,
-    });
+    console.log(refreshToken);
+    res.json({ data: accessToken, refreshToken, userId: user._id });
   } catch (error) {
-    logger.error("");
+    console.log(error);
   }
 };
 

@@ -8,9 +8,9 @@ const postSchema = new mongoose.Schema(
       required: true,
     },
     content: { type: String, required: true },
-    mediaUrl: { type: String },
+    mediaIds: { type: String },
     createdAt: {
-      type: Date.now,
+      type: Date,
       default: Date.now,
     },
   },
@@ -18,3 +18,7 @@ const postSchema = new mongoose.Schema(
 );
 
 postSchema.index({ content: "text" });
+
+const Post = mongoose.model("Post", postSchema);
+
+export default Post;

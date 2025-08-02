@@ -14,13 +14,13 @@ export const generateToken = async (user) => {
 
   const refreshToken = crypto.randomBytes(40).toString("hex");
   const expiresAt = new Date();
-  expiresAt.setDate(expiresAt, getDate() * 7);
+  expiresAt.setDate(expiresAt.getDate() * 7);
 
   await RefreshToken.create({
     token: refreshToken,
     user: user._id,
     expiresAt,
   });
-
-  return accessToken, refreshToken;
+  console.log(process.env.JWT_SECRET);
+  return { accessToken, refreshToken };
 };
