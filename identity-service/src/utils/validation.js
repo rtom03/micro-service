@@ -2,7 +2,7 @@ import joi from "joi";
 
 export const validateInput = (data) => {
   const schema = joi.object({
-    username: joi.string().min(3).max(50).required(),
+    username: joi.string().min(3).max(50),
     email: joi.string().email().required(),
     password: joi.string().min(8).required(),
   });
