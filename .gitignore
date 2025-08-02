@@ -1,0 +1,13 @@
+# Ignore node_modules in all services
+**/node_modules/
+
+# Ignore all .env files in subdirectories
+**/.env
+
+# Ignore log files in all directories
+**/combined.log
+**/error.log
+
+# Optional: ignore OS or editor-specific files
+.DS_Store
+*.swp
