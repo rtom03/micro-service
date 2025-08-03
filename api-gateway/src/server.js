@@ -5,7 +5,8 @@ import Redis from "ioredis";
 import helmet from "helmet";
 import expressRateLimit from "express-rate-limit";
 import { RedisStore } from "rate-limit-redis";
-import logger from "../../identity-service/src/utils/logger.js";
+import logger from "./utils/logger.js";
+import idLogger from "../../identity-service/src/utils/logger.js";
 import proxy from "express-http-proxy";
 import errorHandler from "./middleware/errorHandler.js";
 import { validateToken } from "./middleware/authMiddleware.js";
@@ -66,7 +67,7 @@ app.use(
       return proxyReqOpts;
     },
     userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
-      logger.info(
+      idLogger.info(
         `Response received from identity service: ${proxyRes.statusCode}`
       );
       return proxyResData;
@@ -86,14 +87,37 @@ app.use(
       return proxyReqOpts;
     },
     userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
-      logger.info(
-        `Response received from identity service: ${proxyRes.statusCode}`
+      idLogger.info(
+        `Response received from post service: ${proxyRes.statusCode}`
       );
       return proxyResData;
     },
   })
 );
 
+// setting up proxy for our post service
+app.use(
+  "/v1/media",
+  validateToken,
+  proxy(process.env.MEDIA_SERVICE_URL, {
+    ...proxyOptions,
+    proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+      proxyReqOpts.headers["x-user-id"] = srcReq.user.userId;
+      if (!srcReq.headers["content-type"].startsWith("multipart/form-data")) {
+        proxyReqOpts.headers["content-type"] = "application/json";
+      }
+      return proxyReqOpts;
+    },
+    userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
+      logger.info(
+        `Response received from media service: ${proxyRes.statusCode}`
+      );
+      console.log(proxyRes.statusCode);
+      return proxyResData;
+    },
+    parseReqBody: false,
+  })
+);
 app.use(errorHandler);
 
 app.listen(PORT, () => {
@@ -101,10 +125,7 @@ app.listen(PORT, () => {
   logger.info(
     `IDENTITY SERVICE LISTENING ON http://localhost:${process.env.IDENTITY_SERVICE_URL}`
   );
-  logger.info(
-    `POST SERVICE LISTENING ON http://localhost:${process.env.POST_SERVICE_URL}`
-  );
-  logger.info(
-    `REDIS URL LISTENING ON http://localhost:${process.env.REDIS_URL}`
-  );
+  logger.info(`POST SERVICE LISTENING ON ${process.env.POST_SERVICE_URL}`);
+  logger.info(`MEDIA SERVICE LISTENING ON ${process.env.MEDIA_SERVICE_URL}`);
+  logger.info(`REDIS URL LISTENING ON ${process.env.REDIS_URL}`);
 });
