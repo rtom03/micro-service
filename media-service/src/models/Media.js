@@ -20,9 +20,12 @@ const mediaSchema = mongoose.Schema(
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: UserActivation,
+      ref: "User",
       required: true,
     },
+    // buffer: {
+    //   type: String,
+    // },
   },
   { timeStamp: true }
 );

@@ -1,12 +1,16 @@
-import cloudinary from "cloudinary";
+import { v2 as cloudinary } from "cloudinary";
+
+import dotenv from "dotenv";
+
+dotenv.config();
 
 cloudinary.config({
-  cloud_name: "rtom",
+  cloud_name: "djnxc7hp4",
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
 
-export const uploadToMedia = (file) => {
+const uploadToMedia = (file) => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
@@ -24,3 +28,5 @@ export const uploadToMedia = (file) => {
     uploadStream.end(file.buffer);
   });
 };
+
+export { uploadToMedia };
