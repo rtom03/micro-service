@@ -1,7 +1,7 @@
 import { Media } from "../models/Media.js";
 import { uploadToMedia } from "../utils/cloudinary.js";
 
-export const iUploadMedia = async (req, res) => {
+const iUploadMedia = async (req, res) => {
   try {
     // console.log(req.file);
     if (!req.file) {
@@ -33,3 +33,20 @@ export const iUploadMedia = async (req, res) => {
     console.log(error);
   }
 };
+
+const getAllMedia = async (req, res) => {
+  try {
+    const results = await Media.find({});
+    return res
+      .status(200)
+      .json({
+        success: true,
+        message: "Media data fetched successfully",
+        results,
+      });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export { iUploadMedia, getAllMedia };

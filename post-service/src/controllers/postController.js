@@ -1,4 +1,5 @@
 import Post from "../models/Post.js";
+import { publishEvent } from "../utils/rabbitmq.js";
 import logger from "./../utils/logger.js";
 
 async function invalidatePostCache(req, input) {
@@ -138,6 +139,14 @@ const deletePost = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Post not found" });
     }
+
+    //publish post delete method -->
+    await publishEvent("post.deleted", {
+      postId: post._id.toString(),
+      userId: req.user.userId,
+      mediaIds: post.mediaIds,
+    });
+
     await invalidatePostCache(req, req.params.id);
     res
       .status(200)
@@ -146,4 +155,5 @@ const deletePost = async (req, res) => {
     console.log(error);
   }
 };
+
 export { createPost, getPost, getPosts, deletePost };

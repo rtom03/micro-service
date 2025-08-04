@@ -6,6 +6,8 @@ import helmet from "helmet";
 import Redis from "ioredis";
 import mediaRoutes from "./routes/mediaRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import { connectRabbitMQ, consumeEvent } from "./utils/rabbitmq.js";
+import { handlePostDeleted } from "./eventHandlers/mediaEventHandlers.js";
 
 dotenv.config();
 
@@ -27,6 +29,18 @@ app.use(express.json());
 app.use("/api/media", mediaRoutes);
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`server listening on on http://localhost:${PORT}`);
-});
+async function startServer() {
+  try {
+    await connectRabbitMQ();
+    // consume events
+    await consumeEvent("post.deleted", handlePostDeleted);
+
+    app.listen(PORT, () => {
+      console.log(`server listening on on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+startServer();
