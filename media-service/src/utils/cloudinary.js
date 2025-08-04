@@ -29,4 +29,14 @@ const uploadToMedia = (file) => {
   });
 };
 
-export { uploadToMedia };
+const ideleteMedia = async (publicId) => {
+  try {
+    const result = await cloudinary.uploader.destroy(publicId);
+    console.log("Media deleted successfully", publicId);
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export { uploadToMedia, ideleteMedia };

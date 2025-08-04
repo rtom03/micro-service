@@ -7,7 +7,8 @@ import Redis from "ioredis";
 import postRoutes from "./routes/postRoutes.js";
 import logger from "./utils/logger.js";
 import { errorHandler } from "./middleware/errorHandler.js";
-import expressRateLimit from "express-rate-limit";
+import { connectRabbitMQ } from "./utils/rabbitmq.js";
+// import expressRateLimit from "express-rate-limit";
 // import { RedisStore } from "rate-limit-redis";
 
 dotenv.config();
@@ -51,6 +52,15 @@ app.use(
 
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`server listening on on http://localhost:${PORT}`);
-});
+async function startServer() {
+  try {
+    await connectRabbitMQ();
+    app.listen(PORT, () => {
+      console.log(`server listening on on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+startServer();
