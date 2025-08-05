@@ -30,7 +30,14 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/search", searchRoutes);
+app.use(
+  "/api/search",
+  (req, res, next) => {
+    req.redisClient = redisClient;
+    next();
+  },
+  searchRoutes
+);
 
 app.use(errorHandler);
 
