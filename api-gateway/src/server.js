@@ -118,6 +118,26 @@ app.use(
     parseReqBody: false,
   })
 );
+
+app.use(
+  "/v1/search",
+  validateToken,
+  proxy(process.env.SEARCH_SERVICE_URL, {
+    ...proxyOptions,
+    proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+      proxyReqOpts.headers["content-type"] = "application/json";
+      proxyReqOpts.headers["x-user-id"] = srcReq.user.userId;
+      return proxyReqOpts;
+    },
+    userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
+      idLogger.info(
+        `Response received from search service: ${proxyRes.statusCode}`
+      );
+      return proxyResData;
+    },
+  })
+);
+
 app.use(errorHandler);
 
 app.listen(PORT, () => {
@@ -127,5 +147,7 @@ app.listen(PORT, () => {
   );
   logger.info(`POST SERVICE LISTENING ON ${process.env.POST_SERVICE_URL}`);
   logger.info(`MEDIA SERVICE LISTENING ON ${process.env.MEDIA_SERVICE_URL}`);
+  logger.info(`SEARCH SERVICE LISTENING ON ${process.env.SEARCH_SERVICE_URL}`);
+
   logger.info(`REDIS URL LISTENING ON ${process.env.REDIS_URL}`);
 });

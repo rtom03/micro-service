@@ -19,15 +19,19 @@ async function connectRabbitMQ() {
 }
 
 async function publishEvent(routingKey, message) {
-  if (!channel) {
-    await connectRabbitMQ();
+  try {
+    if (!channel) {
+      await connectRabbitMQ();
+    }
+    channel.publish(
+      EXCHANGE_NAME,
+      routingKey,
+      Buffer.from(JSON.stringify(message))
+    );
+    console.log(`Event published: ${routingKey}`);
+  } catch (error) {
+    console.log(error);
   }
-  channel.publish(
-    EXCHANGE_NAME,
-    routingKey,
-    Buffer.from(JSON.stringify(message))
-  );
-  console.log(`Event published: ${routingKey}`);
 }
 
 export { connectRabbitMQ, publishEvent };
